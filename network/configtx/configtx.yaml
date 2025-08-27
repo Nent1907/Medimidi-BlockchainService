@@ -1,0 +1,239 @@
+# ConfigTx.yaml - Medimidi Blockchain Service Configuration
+#
+# Bu dosya Hyperledger Fabric ağının konfigürasyonunu tanımlar
+# Tıbbi tanı sistemi için RAFT konsensüs algoritması kullanır
+# Domain: medimidi.com | Orderers: 2 | Peers: 2 (Org1, Org2)
+
+################################################################################
+#
+#   ORGANIZATIONS
+#
+################################################################################
+Organizations:
+    # OrdererOrg defines the orderer organization
+    - &OrdererOrg
+        Name: OrdererOrg
+        ID: OrdererMSP
+        MSPDir: ../organizations/ordererOrganizations/medimidi.com/msp
+        Policies:
+            Readers:
+                Type: Signature
+                Rule: "OR('OrdererMSP.member')"
+            Writers:
+                Type: Signature
+                Rule: "OR('OrdererMSP.member')"
+            Admins:
+                Type: Signature
+                Rule: "OR('OrdererMSP.admin')"
+        OrdererEndpoints:
+            - orderer0.medimidi.com:7050
+            - orderer1.medimidi.com:8050
+
+    # Org1 - Hastane/Klinik Organizasyonu (Tıbbi kayıtlar ve hasta verileri)
+    - &Org1
+        Name: Org1MSP
+        ID: Org1MSP
+        MSPDir: ../organizations/peerOrganizations/org1.medimidi.com/msp
+        Policies:
+            Readers:
+                Type: Signature
+                Rule: "OR('Org1MSP.admin', 'Org1MSP.peer', 'Org1MSP.client')"
+            Writers:
+                Type: Signature
+                Rule: "OR('Org1MSP.admin', 'Org1MSP.client')"
+            Admins:
+                Type: Signature
+                Rule: "OR('Org1MSP.admin')"
+            Endorsement:
+                Type: Signature
+                Rule: "OR('Org1MSP.peer')"
+        AnchorPeers:
+            - Host: peer0.org1.medimidi.com
+              Port: 7051
+
+    # Org2 - Laboratuvar/Teşhis Organizasyonu (Test sonuçları ve tanı verileri)  
+    - &Org2
+        Name: Org2MSP
+        ID: Org2MSP
+        MSPDir: ../organizations/peerOrganizations/org2.medimidi.com/msp
+        Policies:
+            Readers:
+                Type: Signature
+                Rule: "OR('Org2MSP.admin', 'Org2MSP.peer', 'Org2MSP.client')"
+            Writers:
+                Type: Signature
+                Rule: "OR('Org2MSP.admin', 'Org2MSP.client')"
+            Admins:
+                Type: Signature
+                Rule: "OR('Org2MSP.admin')"
+            Endorsement:
+                Type: Signature
+                Rule: "OR('Org2MSP.peer')"
+        AnchorPeers:
+            - Host: peer0.org2.medimidi.com
+              Port: 9051
+
+################################################################################
+#
+#   CAPABILITIES
+#
+################################################################################
+Capabilities:
+    Channel: &ChannelCapabilities
+        V2_0: true
+
+    Orderer: &OrdererCapabilities
+        V2_0: true
+
+    Application: &ApplicationCapabilities
+        V2_0: true
+
+################################################################################
+#
+#   APPLICATION
+#
+################################################################################
+Application: &ApplicationDefaults
+    Organizations:
+    Policies:
+        Readers:
+            Type: ImplicitMeta
+            Rule: "ANY Readers"
+        Writers:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+        Admins:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Admins"
+        LifecycleEndorsement:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Endorsement"
+        Endorsement:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Endorsement"
+    Capabilities:
+        <<: *ApplicationCapabilities
+
+################################################################################
+#
+#   ORDERER - RAFT CONFIGURATION
+#
+################################################################################
+Orderer: &OrdererDefaults
+    # RAFT Consensus Configuration
+    OrdererType: etcdraft
+    
+    # RAFT specific configuration
+    EtcdRaft:
+        Consenters:
+            - Host: orderer0.medimidi.com
+              Port: 7050
+              ClientTLSCert: ../organizations/ordererOrganizations/medimidi.com/orderers/orderer0.medimidi.com/tls/server.crt
+              ServerTLSCert: ../organizations/ordererOrganizations/medimidi.com/orderers/orderer0.medimidi.com/tls/server.crt
+            - Host: orderer1.medimidi.com
+              Port: 8050
+              ClientTLSCert: ../organizations/ordererOrganizations/medimidi.com/orderers/orderer1.medimidi.com/tls/server.crt
+              ServerTLSCert: ../organizations/ordererOrganizations/medimidi.com/orderers/orderer1.medimidi.com/tls/server.crt
+            
+        # RAFT Options - Medimidi Tıbbi Tanı Sistemi İçin Optimize Edilmiş
+        Options:
+            TickInterval: 500ms      # Tick aralığı - ağ gecikmeleri için
+            ElectionTick: 10         # Lider seçim süresi  
+            HeartbeatTick: 1         # Heartbeat sıklığı
+            MaxInflightBlocks: 5     # Eşzamanlı işlenen blok sayısı
+            SnapshotIntervalSize: 20MB # Tıbbi veri için artırıldı
+
+    # Batch configuration - Tıbbi tanı verileri için optimize edilmiş
+    BatchTimeout: 1s              # Daha hızlı işlem için azaltıldı
+    BatchSize:
+        MaxMessageCount: 8        # Tıbbi veri güvenliği için azaltıldı
+        AbsoluteMaxBytes: 50MB    # Tıbbi görüntüler için yeterli
+        PreferredMaxBytes: 1MB    # Ortalama tıbbi veri boyutu
+
+    Organizations:
+    Policies:
+        Readers:
+            Type: ImplicitMeta
+            Rule: "ANY Readers"
+        Writers:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+        Admins:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Admins"
+        BlockValidation:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+    
+    Capabilities:
+        <<: *OrdererCapabilities
+
+################################################################################
+#
+#   CHANNEL
+#
+################################################################################
+Channel: &ChannelDefaults
+    Policies:
+        Readers:
+            Type: ImplicitMeta
+            Rule: "ANY Readers"
+        Writers:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+        Admins:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Admins"
+    
+    Capabilities:
+        <<: *ChannelCapabilities
+
+################################################################################
+#
+#   PROFILES
+#
+################################################################################
+Profiles:
+    # Medimidi Genesis Block Profili - Orderer düğümleri için
+    MedimidiOrdererGenesis:
+        <<: *ChannelDefaults
+        Orderer:
+            <<: *OrdererDefaults
+            Organizations:
+                - *OrdererOrg
+            Capabilities:
+                <<: *OrdererCapabilities
+        Consortiums:
+            MedimidiConsortium:
+                Organizations:
+                    - *Org1    # Hastane/Klinik organizasyonu
+                    - *Org2    # Laboratuvar/Teşhis organizasyonu
+
+    # Medimidi Tıbbi Tanı Kanalı
+    MedimidiChannel:
+        Consortium: MedimidiConsortium
+        <<: *ChannelDefaults
+        Application:
+            <<: *ApplicationDefaults
+            Organizations:
+                - *Org1    # Hastane/Klinik - tıbbi kayıtlar
+                - *Org2    # Laboratuvar/Teşhis - test sonuçları
+            Capabilities:
+                <<: *ApplicationCapabilities
+
+    # Development Profili - Geliştirme ve test ortamı için
+    MedimidiDevelopment:
+        <<: *ChannelDefaults
+        Orderer:
+            <<: *OrdererDefaults
+            Organizations:
+                - *OrdererOrg  # Merkezi orderer
+            Capabilities:
+                <<: *OrdererCapabilities
+        Application:
+            <<: *ApplicationDefaults
+            Organizations:
+                - *Org1    # Test hastane organizasyonu
+                - *Org2    # Test laboratuvar organizasyonu
+            Capabilities:
+                <<: *ApplicationCapabilities

@@ -67,10 +67,9 @@ out/
 test-results/
 coverage/
 
-# Blockchain artifacts
+# Blockchain artifacts  
 *.block
 *.tx
-configtx/
 crypto-config/
 
 # CouchDB data
