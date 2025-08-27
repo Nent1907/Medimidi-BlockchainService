@@ -1,0 +1,327 @@
+# Tıbbi Tanı Blockchain Sistemi
+# Hyperledger Fabric Ağ Konfigürasyonu
+
+version: '3.8'
+
+volumes:
+  orderer0.medimidi.com:
+  orderer1.medimidi.com:
+  peer0.org1.medimidi.com:
+  peer0.org2.medimidi.com:
+  
+networks:
+  medical-network:
+    driver: bridge
+
+services:
+  # Org1 için Fabric CA
+  ca.org1.medimidi.com:
+    image: hyperledger/fabric-ca:1.5.2
+    environment:
+      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_CA_NAME=ca.org1.medimidi.com
+      - FABRIC_CA_SERVER_TLS_ENABLED=true
+      - FABRIC_CA_SERVER_PORT=7054
+      - FABRIC_CA_SERVER_OPERATIONS_LISTENADDRESS=0.0.0.0:17054
+    ports:
+      - "7054:7054"
+      - "17054:17054"
+    command: sh -c 'fabric-ca-server start -b admin:adminpw -d'
+    volumes:
+      - ./network/organizations/fabric-ca/org1:/etc/hyperledger/fabric-ca-server
+    container_name: ca.org1.medimidi.com
+    networks:
+      - medical-network
+
+  # Org2 için Fabric CA
+  ca.org2.medimidi.com:
+    image: hyperledger/fabric-ca:1.5.2
+    environment:
+      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_CA_NAME=ca.org2.medimidi.com
+      - FABRIC_CA_SERVER_TLS_ENABLED=true
+      - FABRIC_CA_SERVER_PORT=8054
+      - FABRIC_CA_SERVER_OPERATIONS_LISTENADDRESS=0.0.0.0:18054
+    ports:
+      - "8054:8054"
+      - "18054:18054"
+    command: sh -c 'fabric-ca-server start -b admin:adminpw -d'
+    volumes:
+      - ./network/organizations/fabric-ca/org2:/etc/hyperledger/fabric-ca-server
+    container_name: ca.org2.medimidi.com
+    networks:
+      - medical-network
+
+  # Orderer için Fabric CA
+  ca.orderer.medimidi.com:
+    image: hyperledger/fabric-ca:1.5.2
+    environment:
+      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_CA_NAME=ca.orderer.medimidi.com
+      - FABRIC_CA_SERVER_TLS_ENABLED=true
+      - FABRIC_CA_SERVER_PORT=9054
+      - FABRIC_CA_SERVER_OPERATIONS_LISTENADDRESS=0.0.0.0:19054
+    ports:
+      - "9054:9054"
+      - "19054:19054"
+    command: sh -c 'fabric-ca-server start -b admin:adminpw -d'
+    volumes:
+      - ./network/organizations/fabric-ca/orderer:/etc/hyperledger/fabric-ca-server
+    container_name: ca.orderer.medimidi.com
+    networks:
+      - medical-network
+
+  # Orderer Düğüm 0 (RAFT Lideri)
+  orderer0.medimidi.com:
+    container_name: orderer0.medimidi.com
+    image: hyperledger/fabric-orderer:2.2.4
+    environment:
+      - FABRIC_LOGGING_SPEC=INFO
+      - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
+      - ORDERER_GENERAL_LISTENPORT=7050
+      - ORDERER_GENERAL_LOCALMSPID=OrdererMSP
+      - ORDERER_GENERAL_LOCALMSPDIR=/var/hyperledger/orderer/msp
+      # TLS Konfigürasyonu
+      - ORDERER_GENERAL_TLS_ENABLED=true
+      - ORDERER_GENERAL_TLS_PRIVATEKEY=/var/hyperledger/orderer/tls/server.key
+      - ORDERER_GENERAL_TLS_CERTIFICATE=/var/hyperledger/orderer/tls/server.crt
+      - ORDERER_GENERAL_TLS_ROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]
+      # RAFT Cluster Konfigürasyonu
+      - ORDERER_GENERAL_CLUSTER_CLIENTCERTIFICATE=/var/hyperledger/orderer/tls/server.crt
+      - ORDERER_GENERAL_CLUSTER_CLIENTPRIVATEKEY=/var/hyperledger/orderer/tls/server.key
+      - ORDERER_GENERAL_CLUSTER_ROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]
+      - ORDERER_GENERAL_BOOTSTRAPMETHOD=file
+      - ORDERER_GENERAL_BOOTSTRAPFILE=/var/hyperledger/orderer/orderer.genesis.block
+      # Yönetici Konfigürasyonu
+      - ORDERER_ADMIN_TLS_ENABLED=true
+      - ORDERER_ADMIN_TLS_CERTIFICATE=/var/hyperledger/orderer/tls/server.crt
+      - ORDERER_ADMIN_TLS_PRIVATEKEY=/var/hyperledger/orderer/tls/server.key
+      - ORDERER_ADMIN_TLS_ROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]
+      - ORDERER_ADMIN_TLS_CLIENTROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]
+      - ORDERER_ADMIN_LISTENADDRESS=0.0.0.0:7053
+      - ORDERER_OPERATIONS_LISTENADDRESS=orderer0.medimidi.com:9443
+      - ORDERER_METRICS_PROVIDER=prometheus
+    working_dir: /root
+    command: orderer
+    volumes:
+      - ./network/organizations/ordererOrganizations/medimidi.com/orderers/orderer0.medimidi.com/msp:/var/hyperledger/orderer/msp
+      - ./network/organizations/ordererOrganizations/medimidi.com/orderers/orderer0.medimidi.com/tls/:/var/hyperledger/orderer/tls
+      - ./network/system-genesis.block:/var/hyperledger/orderer/orderer.genesis.block
+      - orderer0.medimidi.com:/var/hyperledger/production/orderer
+    ports:
+      - 7050:7050
+      - 7053:7053
+      - 9443:9443
+    networks:
+      - medical-network
+
+  # Orderer Düğüm 1 (RAFT Takipçisi)
+  orderer1.medimidi.com:
+    container_name: orderer1.medimidi.com
+    image: hyperledger/fabric-orderer:2.2.4
+    environment:
+      - FABRIC_LOGGING_SPEC=INFO
+      - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
+      - ORDERER_GENERAL_LISTENPORT=8050
+      - ORDERER_GENERAL_LOCALMSPID=OrdererMSP
+      - ORDERER_GENERAL_LOCALMSPDIR=/var/hyperledger/orderer/msp
+      # TLS Konfigürasyonu
+      - ORDERER_GENERAL_TLS_ENABLED=true
+      - ORDERER_GENERAL_TLS_PRIVATEKEY=/var/hyperledger/orderer/tls/server.key
+      - ORDERER_GENERAL_TLS_CERTIFICATE=/var/hyperledger/orderer/tls/server.crt
+      - ORDERER_GENERAL_TLS_ROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]
+      # RAFT Küme Konfigürasyonu
+      - ORDERER_GENERAL_CLUSTER_CLIENTCERTIFICATE=/var/hyperledger/orderer/tls/server.crt
+      - ORDERER_GENERAL_CLUSTER_CLIENTPRIVATEKEY=/var/hyperledger/orderer/tls/server.key
+      - ORDERER_GENERAL_CLUSTER_ROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]
+      - ORDERER_GENERAL_BOOTSTRAPMETHOD=file
+      - ORDERER_GENERAL_BOOTSTRAPFILE=/var/hyperledger/orderer/orderer.genesis.block
+      # Yönetici Konfigürasyonu
+      - ORDERER_ADMIN_TLS_ENABLED=true
+      - ORDERER_ADMIN_TLS_CERTIFICATE=/var/hyperledger/orderer/tls/server.crt
+      - ORDERER_ADMIN_TLS_PRIVATEKEY=/var/hyperledger/orderer/tls/server.key
+      - ORDERER_ADMIN_TLS_ROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]
+      - ORDERER_ADMIN_TLS_CLIENTROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]
+      - ORDERER_ADMIN_LISTENADDRESS=0.0.0.0:8053
+      - ORDERER_OPERATIONS_LISTENADDRESS=orderer1.medimidi.com:9444
+      - ORDERER_METRICS_PROVIDER=prometheus
+    working_dir: /root
+    command: orderer
+    volumes:
+      - ./network/organizations/ordererOrganizations/medimidi.com/orderers/orderer1.medimidi.com/msp:/var/hyperledger/orderer/msp
+      - ./network/organizations/ordererOrganizations/medimidi.com/orderers/orderer1.medimidi.com/tls/:/var/hyperledger/orderer/tls
+      - ./network/system-genesis.block:/var/hyperledger/orderer/orderer.genesis.block
+      - orderer1.medimidi.com:/var/hyperledger/production/orderer
+    ports:
+      - 8050:8050
+      - 8053:8053
+      - 9444:9444
+    networks:
+      - medical-network
+
+
+
+  # Org1 Peer için CouchDB
+  couchdb0.org1:
+    container_name: couchdb0.org1
+    image: couchdb:2.3.1
+    environment:
+      - COUCHDB_USER=admin
+      - COUCHDB_PASSWORD=adminpw
+    ports:
+      - "5984:5984"
+    networks:
+      - medical-network
+
+  # Org1 Eş Düğümü
+  peer0.org1.medimidi.com:
+    container_name: peer0.org1.medimidi.com
+    image: hyperledger/fabric-peer:2.2.4
+    restart: always
+    labels:
+      service: hyperledger-fabric
+    environment:
+      - FABRIC_LOGGING_SPEC=INFO
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_FILESYSTEMPATH=/var/hyperledger/production
+      - CORE_PEER_PROFILE_ENABLED=false
+      - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/server.key
+      - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/fabric/tls/ca.crt
+      #Peer düğümü özel değişkenleri
+      - CORE_PEER_ID=peer0.org1.medimidi.com
+      - CORE_PEER_ADDRESS=peer0.org1.medimidi.com:7051
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
+      - CORE_PEER_CHAINCODEADDRESS=peer0.org1.medimidi.com:7052
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.org1.medimidi.com:7051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.org1.medimidi.com:7051
+      - CORE_PEER_LOCALMSPID=Org1MSP
+      - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/fabric/msp
+      - CORE_OPERATIONS_LISTENADDRESS=peer0.org1.medimidi.com:9446
+      - CORE_METRICS_PROVIDER=prometheus
+      - CORE_CHAINCODE_BUILDER=hyperledger/fabric-ccenv:2.2.4
+      - CORE_CHAINCODE_GOLANG_RUNTIME=hyperledger/fabric-baseos:2.2.4
+      - CORE_CHAINCODE_EXTERNALBUILDERS=
+      - CORE_CHAINCODE_PULL=false
+      - CORE_CHAINCODE_JAVA_RUNTIME=hyperledger/fabric-javaenv:2.2.4
+      - CORE_CHAINCODE_NODE_RUNTIME=hyperledger/fabric-nodeenv:2.2.4
+      - CORE_CHAINCODE_SYSTEMCHAINCODES=cscc,lscc,escc,vscc,qscc,_lifecycle
+      - CORE_CHAINCODE_EXECUTETIMEOUT=300s
+      # - CORE_CHAINCODE_MODE=dev
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=blockchainservice_medical-network
+      # CouchDB Ayarları
+      - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb0.org1:5984
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME=admin
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=adminpw
+    volumes:
+      - ./network/organizations/peerOrganizations/org1.medimidi.com/peers/peer0.org1.medimidi.com:/etc/hyperledger/fabric
+      - ./config/core.yaml:/etc/hyperledger/fabric/core.yaml
+      - peer0.org1.medimidi.com:/var/hyperledger/production
+      - /var/run/docker.sock:/host/var/run/docker.sock
+    working_dir: /root
+    command: peer node start
+    ports:
+      - 7051:7051
+      - 9446:9446
+    depends_on:
+      - couchdb0.org1
+    networks:
+      - medical-network
+
+  # Org2 Peer için CouchDB
+  couchdb0.org2:
+    container_name: couchdb0.org2
+    image: couchdb:2.3.1
+    environment:
+      - COUCHDB_USER=admin
+      - COUCHDB_PASSWORD=adminpw
+    ports:
+      - "7984:5984"
+    networks:
+      - medical-network
+
+  # Org2 Eş Düğümü
+  peer0.org2.medimidi.com:
+    container_name: peer0.org2.medimidi.com
+    image: hyperledger/fabric-peer:2.2.4
+    restart: always
+    labels:
+      service: hyperledger-fabric
+    environment:
+      - FABRIC_LOGGING_SPEC=INFO
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_FILESYSTEMPATH=/var/hyperledger/production
+      - CORE_PEER_PROFILE_ENABLED=false
+      - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/server.key
+      - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/fabric/tls/ca.crt
+      # Eş düğümü özel değişkenleri
+      - CORE_PEER_ID=peer0.org2.medimidi.com
+      - CORE_PEER_ADDRESS=peer0.org2.medimidi.com:9051
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:9051
+      - CORE_PEER_CHAINCODEADDRESS=peer0.org2.medimidi.com:9052
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:9052
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.org2.medimidi.com:9051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.org2.medimidi.com:9051
+      - CORE_PEER_LOCALMSPID=Org2MSP
+      - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/fabric/msp
+      - CORE_OPERATIONS_LISTENADDRESS=peer0.org2.medimidi.com:9447
+      - CORE_METRICS_PROVIDER=prometheus
+      - CORE_CHAINCODE_BUILDER=hyperledger/fabric-ccenv:2.2.4
+      - CORE_CHAINCODE_GOLANG_RUNTIME=hyperledger/fabric-baseos:2.2.4
+      - CORE_CHAINCODE_EXTERNALBUILDERS=
+      - CORE_CHAINCODE_PULL=false
+      - CORE_CHAINCODE_JAVA_RUNTIME=hyperledger/fabric-javaenv:2.2.4
+      - CORE_CHAINCODE_NODE_RUNTIME=hyperledger/fabric-nodeenv:2.2.4
+      - CORE_CHAINCODE_SYSTEMCHAINCODES=cscc,lscc,escc,vscc,qscc,_lifecycle
+      - CORE_CHAINCODE_EXECUTETIMEOUT=300s
+      # - CORE_CHAINCODE_MODE=dev
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=blockchainservice_medical-network
+      # CouchDB Ayarları
+      - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb0.org2:5984
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME=admin
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=adminpw
+    volumes:
+      - ./network/organizations/peerOrganizations/org2.medimidi.com/peers/peer0.org2.medimidi.com:/etc/hyperledger/fabric
+      - ./config/core.yaml:/etc/hyperledger/fabric/core.yaml
+      - peer0.org2.medimidi.com:/var/hyperledger/production
+      - /var/run/docker.sock:/host/var/run/docker.sock
+    working_dir: /root
+    command: peer node start
+    ports:
+      - 9051:9051
+      - 9447:9447
+    depends_on:
+      - couchdb0.org2
+    networks:
+      - medical-network
+
+  # Yönetim görevleri için CLI Konteyneri
+  cli:
+    container_name: cli
+    image: hyperledger/fabric-tools:2.2.4
+    labels:
+      service: hyperledger-fabric
+    tty: true
+    stdin_open: true
+    environment:
+      - GOPATH=/opt/gopath
+      - FABRIC_LOGGING_SPEC=INFO
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+    command: /bin/bash
+    volumes:
+      - ./network/organizations:/opt/gopath/src/github.com/hyperledger/fabric/peer/organizations
+      - ./network:/opt/gopath/src/github.com/hyperledger/fabric/peer/network
+      - ./chaincode:/opt/gopath/src/github.com/chaincode
+    depends_on:
+      - orderer0.medimidi.com
+      - orderer1.medimidi.com
+      - peer0.org1.medimidi.com
+      - peer0.org2.medimidi.com
+    networks:
+      - medical-network

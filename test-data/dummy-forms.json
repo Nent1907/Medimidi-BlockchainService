@@ -1,0 +1,198 @@
+{
+  "medical_diagnosis_forms": [
+    {
+      "formId": "DIAG-2024-001",
+      "doctorId": "DR001",
+      "doctorName": "Dr. Mehmet Yılmaz",
+      "patientId": "PAT001",
+      "patientName": "Ali Demir",
+      "timestamp": "2024-01-15T09:30:00Z",
+      "diagnosis": {
+        "primary": "Esansiyel Hipertansiyon",
+        "secondary": ["Tip 2 Diabetes Mellitus", "Obezite"],
+        "icdCodes": ["I10", "E11.9", "E66.9"]
+      },
+      "symptoms": [
+        "Yüksek kan basıncı (160/95 mmHg)",
+        "Yorgunluk ve güçsüzlük",
+        "Sık idrara çıkma",
+        "Aşırı susama"
+      ],
+      "physicalExam": {
+        "bloodPressure": "160/95 mmHg",
+        "pulse": "88 bpm",
+        "weight": "95 kg",
+        "height": "175 cm",
+        "bmi": "31.0"
+      },
+      "labResults": {
+        "glucose": "180 mg/dL",
+        "hba1c": "8.2%",
+        "cholesterol": "240 mg/dL",
+        "creatinine": "1.1 mg/dL"
+      },
+      "treatment": {
+        "medications": [
+          {
+            "name": "Lisinopril",
+            "dosage": "10mg",
+            "frequency": "Once daily",
+            "duration": "Ongoing"
+          },
+          {
+            "name": "Metformin",
+            "dosage": "500mg",
+            "frequency": "Twice daily",
+            "duration": "Ongoing"
+          }
+        ],
+        "recommendations": [
+          "Az tuzlu diyet (< 2g/gün)",
+          "Düzenli egzersiz 30 dk/gün",
+          "Kilo verme hedefi: 85kg",
+          "Kan şekeri takibi günde 2 kez"
+        ]
+      },
+      "followUp": {
+        "nextAppointment": "2024-02-15T09:30:00Z",
+        "urgentContact": false,
+        "instructions": "Semptomlar kötüleşirse veya kan basıncı > 180/100 olursa başvurun"
+      },
+      "signature": "digital_signature_placeholder_001"
+    },
+    {
+      "formId": "DIAG-2024-002", 
+      "doctorId": "DR002",
+      "doctorName": "Dr. Fatma Özkan",
+      "patientId": "PAT002",
+      "patientName": "Ayşe Kaya",
+      "timestamp": "2024-01-16T14:45:00Z",
+      "diagnosis": {
+        "primary": "Akut Üst Solunum Yolu Enfeksiyonu",
+        "secondary": ["Alerjik Rinit"],
+        "icdCodes": ["J06.9", "J30.9"]
+      },
+      "symptoms": [
+        "Boğaz ağrısı",
+        "Burun tıkanıklığı",
+        "Hapşırma",
+        "Hafif ateş (37.8°C)",
+        "Hafif başağrısı"
+      ],
+      "physicalExam": {
+        "temperature": "37.8°C",
+        "bloodPressure": "120/80 mmHg",
+        "pulse": "76 bpm",
+        "throatExam": "Kızarık, eksüda yok",
+        "lymphNodes": "Hafif servikal lenfadenopati"
+      },
+      "labResults": {
+        "wbc": "9,200/μL",
+        "neutrophils": "60%",
+        "lymphocytes": "35%"
+      },
+      "treatment": {
+        "medications": [
+          {
+            "name": "Paracetamol",
+            "dosage": "500mg",
+            "frequency": "Every 6 hours as needed",
+            "duration": "5 days"
+          },
+          {
+            "name": "Cetirizine",
+            "dosage": "10mg",
+            "frequency": "Once daily",
+            "duration": "7 days"
+          }
+        ],
+        "recommendations": [
+          "Dinlenme ve yeterli uyku",
+          "Sıvı alımını artırın",
+          "Boğaz pastilleri rahatlık için",
+          "Mümkünse alerjenleri kaçının"
+        ]
+      },
+      "followUp": {
+        "nextAppointment": "2024-01-30T14:45:00Z",
+        "urgentContact": false,
+        "instructions": "Ateş > 39°C olursa veya 3 gün sonra semptomlar kötüleşirse başvurun"
+      },
+      "signature": "digital_signature_placeholder_002"
+    },
+    {
+      "formId": "DIAG-2024-003",
+      "doctorId": "DR003", 
+      "doctorName": "Dr. Ahmet Çelik",
+      "patientId": "PAT003",
+      "patientName": "Mustafa Öz",
+      "timestamp": "2024-01-17T11:15:00Z",
+      "diagnosis": {
+        "primary": "Koroner Arter Hastalığı",
+        "secondary": ["Dislipidemi", "Sigara Kullanım Öyküsü"],
+        "icdCodes": ["I25.9", "E78.5", "Z87.891"]
+      },
+      "symptoms": [
+        "Egzersizle göğüs ağrısı",
+        "Nefes darlığı",
+        "Aktivite sırasında yorgunluk",
+        "Ara sıra istirahat halinde göğüs sıkışması"
+      ],
+      "physicalExam": {
+        "bloodPressure": "145/90 mmHg",
+        "pulse": "82 bpm regular",
+        "heartSounds": "S1, S2 normal, üfürüm yok",
+        "lungSounds": "Bilateral temiz",
+        "edema": "Yok"
+      },
+      "labResults": {
+        "totalCholesterol": "280 mg/dL",
+        "ldl": "190 mg/dL", 
+        "hdl": "35 mg/dL",
+        "triglycerides": "220 mg/dL",
+        "troponin": "< 0.01 ng/mL"
+      },
+      "diagnosticTests": {
+        "ecg": "Normal sinüs ritmi, akut değişiklik yok",
+        "echocardiogram": "LVEF 55%, normal duvar hareketi",
+        "stressTest": "Maks KAH'ın %85'inde iskemi pozitif"
+      },
+      "treatment": {
+        "medications": [
+          {
+            "name": "Atorvastatin",
+            "dosage": "40mg",
+            "frequency": "Once daily evening",
+            "duration": "Ongoing"
+          },
+          {
+            "name": "Aspirin",
+            "dosage": "100mg",
+            "frequency": "Once daily",
+            "duration": "Ongoing"
+          },
+          {
+            "name": "Metoprolol",
+            "dosage": "50mg",
+            "frequency": "Twice daily", 
+            "duration": "Ongoing"
+          }
+        ],
+        "recommendations": [
+          "Sigarayı bırakma zorunlu",
+          "Kalp diyeti - düşük doymuş yağ",
+          "Kademeli egzersiz programı",
+          "Kilo kontrolü",
+          "Stres azaltma teknikleri"
+        ]
+      },
+      "followUp": {
+        "nextAppointment": "2024-02-17T11:15:00Z",
+        "urgentContact": true,
+        "instructions": "10 dakikadan uzun veya artan şiddette göğüs ağrısı için hemen başvurun",
+        "referrals": ["Kalp Damar Cerrahisi konsültasyonu"]
+      },
+      "signature": "digital_signature_placeholder_003"
+    }
+  ]
+}

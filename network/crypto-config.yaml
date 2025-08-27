@@ -1,0 +1,69 @@
+# crypto-config.yaml - Tıbbi Tanı Blockchain Sistemi
+#
+# Bu dosya Hyperledger Fabric ağı için kriptografik konfigürasyonu tanımlar
+# cryptogen aracı tarafından sertifikalar ve anahtarlar oluşturmak için kullanılacak
+#
+
+
+OrdererOrgs:
+  # Tıbbi blockchain orderer organizasyonu için OrdererOrg
+  - Name: Orderer
+    Domain: medimidi.com
+    EnableNodeOUs: true
+    
+    
+    Specs:
+      - Hostname: orderer0  # orderer0.medimidi.com
+        SANS:
+          - localhost
+          - 127.0.0.1
+          - orderer0.medimidi.com
+      - Hostname: orderer1  # orderer1.medimidi.com  
+        SANS:
+          - localhost
+          - 127.0.0.1
+          - orderer1.medimidi.com
+
+
+PeerOrgs:
+  # Org1 - İlk tıbbi organizasyon
+  - Name: Org1
+    Domain: org1.medimidi.com
+    EnableNodeOUs: true
+    
+    
+    CA:
+      Hostname: ca # ca.org1.medimidi.com
+      
+    
+    Template:
+      Count: 1  
+      SANS:
+        - localhost
+        - 127.0.0.1
+        - peer0.org1.medimidi.com
+        
+    # Kullanıcı konfigürasyonu (ek istemci kullanıcıları)
+    Users:
+      Count: 2  # Admin haricinde 2 ek kullanıcı
+      
+  # Org2 - İkinci tıbbi organizasyon  
+  - Name: Org2
+    Domain: org2.medimidi.com
+    EnableNodeOUs: true
+    
+    # CA (Sertifika Otoritesi) konfigürasyonu
+    CA:
+      Hostname: ca # ca.org2.medimidi.com
+      
+    # Peer özelliklerini tanımla  
+    Template:
+      Count: 1  # Her organizasyonda bir peer
+      SANS:
+        - localhost
+        - 127.0.0.1
+        - peer0.org2.medimidi.com
+        
+    # Kullanıcı konfigürasyonu (ek istemci kullanıcıları)
+    Users:
+      Count: 2  # Admin haricinde 2 ek kullanıcı
