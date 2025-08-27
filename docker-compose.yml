@@ -1,5 +1,5 @@
-# Tıbbi Tanı Blockchain Sistemi
-# Hyperledger Fabric Ağ Konfigürasyonu
+# Medi-midi Blockchain Sistemi
+# Hyperledger Fabric Ag Konfigurasyonu
 
 version: '3.8'
 
@@ -14,7 +14,7 @@ networks:
     driver: bridge
 
 services:
-  # Org1 için Fabric CA
+  # Org1 icin Fabric CA
   ca.org1.medimidi.com:
     image: hyperledger/fabric-ca:1.5.2
     environment:
@@ -33,7 +33,7 @@ services:
     networks:
       - medical-network
 
-  # Org2 için Fabric CA
+  # Org2 icin Fabric CA
   ca.org2.medimidi.com:
     image: hyperledger/fabric-ca:1.5.2
     environment:
@@ -52,7 +52,7 @@ services:
     networks:
       - medical-network
 
-  # Orderer için Fabric CA
+  # Orderer icin Fabric CA
   ca.orderer.medimidi.com:
     image: hyperledger/fabric-ca:1.5.2
     environment:
@@ -71,7 +71,7 @@ services:
     networks:
       - medical-network
 
-  # Orderer Düğüm 0 (RAFT Lideri)
+  # Orderer Dugum 0 (RAFT Lideri)
   orderer0.medimidi.com:
     container_name: orderer0.medimidi.com
     image: hyperledger/fabric-orderer:2.2.4
@@ -81,18 +81,18 @@ services:
       - ORDERER_GENERAL_LISTENPORT=7050
       - ORDERER_GENERAL_LOCALMSPID=OrdererMSP
       - ORDERER_GENERAL_LOCALMSPDIR=/var/hyperledger/orderer/msp
-      # TLS Konfigürasyonu
+      # TLS Konfigurasyonu
       - ORDERER_GENERAL_TLS_ENABLED=true
       - ORDERER_GENERAL_TLS_PRIVATEKEY=/var/hyperledger/orderer/tls/server.key
       - ORDERER_GENERAL_TLS_CERTIFICATE=/var/hyperledger/orderer/tls/server.crt
       - ORDERER_GENERAL_TLS_ROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]
-      # RAFT Cluster Konfigürasyonu
+      # RAFT Cluster Konfigurasyonu
       - ORDERER_GENERAL_CLUSTER_CLIENTCERTIFICATE=/var/hyperledger/orderer/tls/server.crt
       - ORDERER_GENERAL_CLUSTER_CLIENTPRIVATEKEY=/var/hyperledger/orderer/tls/server.key
       - ORDERER_GENERAL_CLUSTER_ROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]
       - ORDERER_GENERAL_BOOTSTRAPMETHOD=file
       - ORDERER_GENERAL_BOOTSTRAPFILE=/var/hyperledger/orderer/orderer.genesis.block
-      # Yönetici Konfigürasyonu
+      # Yonetici Konfigurasyonu
       - ORDERER_ADMIN_TLS_ENABLED=true
       - ORDERER_ADMIN_TLS_CERTIFICATE=/var/hyperledger/orderer/tls/server.crt
       - ORDERER_ADMIN_TLS_PRIVATEKEY=/var/hyperledger/orderer/tls/server.key
@@ -115,7 +115,7 @@ services:
     networks:
       - medical-network
 
-  # Orderer Düğüm 1 (RAFT Takipçisi)
+  # Orderer Dugum 1 (RAFT Takipcisi)
   orderer1.medimidi.com:
     container_name: orderer1.medimidi.com
     image: hyperledger/fabric-orderer:2.2.4
@@ -125,18 +125,18 @@ services:
       - ORDERER_GENERAL_LISTENPORT=8050
       - ORDERER_GENERAL_LOCALMSPID=OrdererMSP
       - ORDERER_GENERAL_LOCALMSPDIR=/var/hyperledger/orderer/msp
-      # TLS Konfigürasyonu
+      # TLS Konfigurasyonu
       - ORDERER_GENERAL_TLS_ENABLED=true
       - ORDERER_GENERAL_TLS_PRIVATEKEY=/var/hyperledger/orderer/tls/server.key
       - ORDERER_GENERAL_TLS_CERTIFICATE=/var/hyperledger/orderer/tls/server.crt
       - ORDERER_GENERAL_TLS_ROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]
-      # RAFT Küme Konfigürasyonu
+      # RAFT Kume Konfigurasyonu
       - ORDERER_GENERAL_CLUSTER_CLIENTCERTIFICATE=/var/hyperledger/orderer/tls/server.crt
       - ORDERER_GENERAL_CLUSTER_CLIENTPRIVATEKEY=/var/hyperledger/orderer/tls/server.key
       - ORDERER_GENERAL_CLUSTER_ROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]
       - ORDERER_GENERAL_BOOTSTRAPMETHOD=file
       - ORDERER_GENERAL_BOOTSTRAPFILE=/var/hyperledger/orderer/orderer.genesis.block
-      # Yönetici Konfigürasyonu
+      # Yonetici Konfigurasyonu
       - ORDERER_ADMIN_TLS_ENABLED=true
       - ORDERER_ADMIN_TLS_CERTIFICATE=/var/hyperledger/orderer/tls/server.crt
       - ORDERER_ADMIN_TLS_PRIVATEKEY=/var/hyperledger/orderer/tls/server.key
@@ -161,7 +161,7 @@ services:
 
 
 
-  # Org1 Peer için CouchDB
+  # Org1 Peer icin CouchDB
   couchdb0.org1:
     container_name: couchdb0.org1
     image: couchdb:2.3.1
@@ -173,7 +173,7 @@ services:
     networks:
       - medical-network
 
-  # Org1 Eş Düğümü
+  # Org1 Eş Dugumu
   peer0.org1.medimidi.com:
     container_name: peer0.org1.medimidi.com
     image: hyperledger/fabric-peer:2.2.4
@@ -188,7 +188,7 @@ services:
       - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/server.crt
       - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/server.key
       - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/fabric/tls/ca.crt
-      #Peer düğümü özel değişkenleri
+      #Peer dugumu ozel degişkenleri
       - CORE_PEER_ID=peer0.org1.medimidi.com
       - CORE_PEER_ADDRESS=peer0.org1.medimidi.com:7051
       - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
@@ -231,7 +231,7 @@ services:
     networks:
       - medical-network
 
-  # Org2 Peer için CouchDB
+  # Org2 Peer icin CouchDB
   couchdb0.org2:
     container_name: couchdb0.org2
     image: couchdb:2.3.1
@@ -243,7 +243,7 @@ services:
     networks:
       - medical-network
 
-  # Org2 Eş Düğümü
+  # Org2 Eş Dugumu
   peer0.org2.medimidi.com:
     container_name: peer0.org2.medimidi.com
     image: hyperledger/fabric-peer:2.2.4
@@ -258,7 +258,7 @@ services:
       - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/server.crt
       - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/server.key
       - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/fabric/tls/ca.crt
-      # Eş düğümü özel değişkenleri
+      # Eş dugumu ozel degişkenleri
       - CORE_PEER_ID=peer0.org2.medimidi.com
       - CORE_PEER_ADDRESS=peer0.org2.medimidi.com:9051
       - CORE_PEER_LISTENADDRESS=0.0.0.0:9051
@@ -301,7 +301,7 @@ services:
     networks:
       - medical-network
 
-  # Yönetim görevleri için CLI Konteyneri
+  # Yonetim gorevleri icin CLI Konteyneri
   cli:
     container_name: cli
     image: hyperledger/fabric-tools:2.2.4

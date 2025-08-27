@@ -1,13 +1,13 @@
 test:
   name: medimidi-fabric-perf
-  description: Medimidi BlockchainService için 1ch/2org/2orderer benchmark
+  description: Medimidi BlockchainService icin 1ch/2org/2orderer benchmark
   workers:
     type: local
     number: 4
 
   rounds:
     - label: 25-users
-      description: 25 eşzamanlı kullanıcı, düşük yük
+      description: 25 eszamanli kullanici, dusuk yuk
       txNumber: 500
       rateControl:
         type: fixed-rate
@@ -20,7 +20,7 @@ test:
           contractId: medical-diagnosis
 
     - label: 50-users
-      description: 50 eşzamanlı kullanıcı, orta yük
+      description: 50 eszamanli kullanici, orta yuk
       txNumber: 1500
       rateControl:
         type: fixed-rate
@@ -33,7 +33,7 @@ test:
           contractId: medical-diagnosis
 
     - label: 100-users
-      description: 100 eşzamanlı kullanıcı, stres
+      description: 100 eszamanli kullanici, stres
       txNumber: 3000
       rateControl:
         type: fixed-rate
