@@ -84,7 +84,7 @@ Proje başlangıcında sistemden bağımsız olarak **dummy (örnek) JSON verile
 - [ ] **Sonraki adım**: Network'ü başlatıp test etmek
 - [ ] Gerçek sistem entegrasyonu
 
-## 🏗️ PROJE YAPISIM
+## 🏗️ PROJE YAPISI
 
 ```
 BlockchainService/
