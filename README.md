@@ -106,6 +106,12 @@ BlockchainService/
 └── config/
     ├── fabric-ca/
     └── core.yaml
+└── caliper/
+    ├── workloads/
+    └── benchmark.yaml
+    └── networkConfig.json
+    └── package.json
+
 ```
 
 ## 📊 ÖRNEK JSON FORM YAPISI
