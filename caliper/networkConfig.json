@@ -1,0 +1,66 @@
+{
+  "caliper": { "blockchain": "fabric" },
+  "version": "2.0.0",
+  "client": {
+    "organization": "Org1",
+    "credentialStore": {
+      "path": "./wallet",
+      "cryptoStore": { "path": "./wallet" }
+    }
+  },
+  "channels": {
+    "medimidi-channel": {
+      "created": true,
+      "orderers": ["orderer0.medimidi.com","orderer1.medimidi.com"],
+      "peers": {
+        "peer0.org1.medimidi.com": { "endorsingPeer": true, "chaincodeQuery": true, "ledgerQuery": true, "eventSource": true },
+        "peer0.org2.medimidi.com": { "endorsingPeer": true, "chaincodeQuery": true, "ledgerQuery": true, "eventSource": true }
+      },
+      "contracts": [{
+        "id": "medical-diagnosis"
+      }]
+    }
+  },
+  "organizations": {
+    "Org1": {
+      "mspid": "Org1MSP",
+      "peers": ["peer0.org1.medimidi.com"],
+      "certificateAuthorities": ["ca.org1.medimidi.com"],
+      "adminPrivateKey": { "path": "../network/organizations/peerOrganizations/org1.medimidi.com/users/Admin@org1.medimidi.com/msp/keystore/priv_sk" },
+      "signedCert": { "path": "../network/organizations/peerOrganizations/org1.medimidi.com/users/Admin@org1.medimidi.com/msp/signcerts/cert.pem" }
+    },
+    "Org2": {
+      "mspid": "Org2MSP",
+      "peers": ["peer0.org2.medimidi.com"],
+      "certificateAuthorities": ["ca.org2.medimidi.com"]
+    }
+  },
+  "orderers": {
+    "orderer0.medimidi.com": {
+      "url": "grpc://localhost:7050"
+    },
+    "orderer1.medimidi.com": {
+      "url": "grpc://localhost:8050"
+    }
+  },
+  "peers": {
+    "peer0.org1.medimidi.com": {
+      "url": "grpc://localhost:7051"
+    },
+    "peer0.org2.medimidi.com": {
+      "url": "grpc://localhost:9051"
+    }
+  },
+  "certificateAuthorities": {
+    "ca.org1.medimidi.com": {
+      "url": "http://localhost:7054",
+      "caName": "ca-org1",
+      "httpOptions": { "verify": false }
+    },
+    "ca.org2.medimidi.com": {
+      "url": "http://localhost:8054",
+      "caName": "ca-org2",
+      "httpOptions": { "verify": false }
+    }
+  }
+}

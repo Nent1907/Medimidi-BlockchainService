@@ -1,0 +1,12 @@
+{
+  "name": "medimidi-caliper-bench",
+  "private": true,
+  "dependencies": {
+    "@hyperledger/caliper-cli": "^0.6.0",
+    "@hyperledger/caliper-core": "^0.6.0",
+    "@hyperledger/caliper-fabric": "^0.6.0"
+  },
+  "scripts": {
+    "bench": "npx caliper launch manager --caliper-workspace . --caliper-benchconfig benchmark.yaml --caliper-networkconfig networkConfig.json"
+  }
+}

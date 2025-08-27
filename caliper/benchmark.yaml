@@ -1,0 +1,56 @@
+test:
+  name: medimidi-fabric-perf
+  description: Medimidi BlockchainService için 1ch/2org/2orderer benchmark
+  workers:
+    type: local
+    number: 4
+
+  rounds:
+    - label: 25-users
+      description: 25 eşzamanlı kullanıcı, düşük yük
+      txNumber: 500
+      rateControl:
+        type: fixed-rate
+        opts: { tps: 50 }
+      workload:
+        module: workloads/diagnosis-mixed.js
+        arguments:
+          writeRatio: 0.7
+          channel: medimidi-channel
+          contractId: medical-diagnosis
+
+    - label: 50-users
+      description: 50 eşzamanlı kullanıcı, orta yük
+      txNumber: 1500
+      rateControl:
+        type: fixed-rate
+        opts: { tps: 120 }
+      workload:
+        module: workloads/diagnosis-mixed.js
+        arguments:
+          writeRatio: 0.6
+          channel: medimidi-channel
+          contractId: medical-diagnosis
+
+    - label: 100-users
+      description: 100 eşzamanlı kullanıcı, stres
+      txNumber: 3000
+      rateControl:
+        type: fixed-rate
+        opts: { tps: 220 }
+      workload:
+        module: workloads/diagnosis-mixed.js
+        arguments:
+          writeRatio: 0.5
+          channel: medimidi-channel
+          contractId: medical-diagnosis
+
+monitor:
+  type: [process, docker]
+  docker:
+    containers:
+      - peer0.org1.medimidi.com
+      - peer0.org2.medimidi.com
+      - orderer0.medimidi.com
+      - orderer1.medimidi.com
+  interval: 5
